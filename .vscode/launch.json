@@ -1,0 +1,16 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Launch Program",
+            "preLaunchTask": "tsc: build - tsconfig.json",
+            "outFiles": ["${workspaceFolder}/dist/src/**/*.js"],
+            "runtimeArgs": ["-r", "tsconfig-paths/register", "${workspaceFolder}/dist/src/main.js"],
+            "env": {
+                "TS_NODE_BASEURL": "./dist"
+            }
+        }
+    ]
+}
