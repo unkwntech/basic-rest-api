@@ -1,7 +1,7 @@
 import { Factory } from "@models/factory";
 import { Identifiable } from "@models/identifiable";
 import { Document, MongoClient } from "mongodb";
-import { ObjectNotFoundError } from "../errors";
+import { ObjectNotFoundError } from "./errors";
 
 require("dotenv").config();
 // TODO: Db connection pooling.
