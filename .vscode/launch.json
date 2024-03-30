@@ -7,7 +7,11 @@
             "name": "Launch Program",
             "preLaunchTask": "tsc: build - tsconfig.json",
             "outFiles": ["${workspaceFolder}/dist/src/**/*.js"],
-            "runtimeArgs": ["-r", "tsconfig-paths/register", "${workspaceFolder}/dist/src/main.js"],
+            "runtimeArgs": [
+                "-r",
+                "tsconfig-paths/register",
+                "${workspaceFolder}/dist/main.js"
+            ],
             "env": {
                 "TS_NODE_BASEURL": "./dist"
             }
