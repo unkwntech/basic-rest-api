@@ -6,5 +6,7 @@ namespace NodeJS {
         SSL_CERT: string;
         SSL_PKEY: string;
         SSL_ENABLED: string;
+        JWT_ISSUER: string;
+        JWT_SECRET: string;
     }
 }
