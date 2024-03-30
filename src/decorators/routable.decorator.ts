@@ -2,6 +2,8 @@ import { swagger } from "@models/swagger/swagger";
 import { swaggerMethod } from "@models/swagger/swaggermethod";
 import { swaggerPath } from "@models/swagger/swaggerpath";
 import Router, { Request, Response } from "express";
+import JWT from "jsonwebtoken";
+import { JWTPayload } from "../models/jwtpayload.model";
 require("dotenv").config();
 
 export const appRouter = Router();
@@ -38,12 +40,21 @@ export const swaggerDeff: swagger = {
             default: parseInt(process.env.DEFAULT_QUERY_LIMIT),
         },
     },
+    responses: {
+        "400": {
+            description: "Not Found",
+        },
+        "420": {
+            description: "Rate Limited",
+        },
+    },
 };
 
 interface IOptions {
     path: string;
     method: "get" | "post" | "put" | "delete" | "head";
     swagger?: swaggerMethod;
+    auth?: boolean;
 }
 
 function routable(options: IOptions) {
@@ -94,8 +105,45 @@ function routable(options: IOptions) {
         descriptor.value = async function (...args: any) {
             let request = args[0] as Request;
             let response = args[1] as Response;
+            let headers = request.headers;
 
-            origFunc(request, response);
+            //Check JWT validity
+            let jwt: JWTPayload = new JWTPayload({
+                name: "",
+                sub: "",
+                perm: [],
+                exp: new Date(),
+            });
+
+            if (options.auth) {
+                if (!headers.authorization) {
+                    response.status(403).send("Auth Header Required");
+                    return;
+                }
+
+                //auth header is in format "Bearer $JWT"
+                if (
+                    headers.authorization
+                        .split(" ")[0]
+                        .trim()
+                        .toLocaleLowerCase() !== "bearer"
+                ) {
+                    //auth header is malformed
+                    response.status(400).send("Invalid auth header");
+                    return;
+                }
+
+                let encodedJwt = headers.authorization.split(" ")[1];
+                if (!JWT.verify(encodedJwt, process.env.JWT_SECRET || "", {})) {
+                    //JWT is invalid, tampered or corrupt
+                    response.status(403).send("Invalid Token");
+                    return;
+                }
+
+                jwt = new JWTPayload(JWT.decode(encodedJwt));
+            }
+
+            origFunc(request, response, jwt);
 
             if (process.env.LOG_LEVEL === "INFO")
                 console.log(`${options.method} - ${request.url}`);
