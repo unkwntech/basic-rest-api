@@ -123,7 +123,9 @@ export class DbUtilities {
     static async Query<T>(
         query: any,
         factory: Factory<T>,
-        projection?: any
+        projection?: any,
+        limit: number = parseInt(process.env.DEFAULT_QUERY_LIMIT),
+        page: number = 1
     ): Promise<T[]> {
         const dbClient = new MongoClient(`${process.env.DB_CONN_STRING}`);
         try {
@@ -132,7 +134,11 @@ export class DbUtilities {
             const database = dbClient.db(process.env.DB_NAME);
             const collection = database.collection(factory.getCollectionName());
             const cursor = collection.find(query);
+            cursor.limit(limit);
+            cursor.skip(page * limit);
+
             const list: T[] = [];
+
             await cursor.forEach((doc) => {
                 let o = factory.make(doc);
                 list.push(o);
