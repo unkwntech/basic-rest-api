@@ -1,3 +1,4 @@
+import { swaggerResponse } from "./swaggerResponse.model";
 import { swaggerParameter } from "./swaggerparameter.model";
 import { swaggerPath } from "./swaggerpath.model";
 
@@ -17,5 +18,8 @@ export interface swagger {
     components?: { [key: string]: any };
     parameters?: {
         [key: string]: swaggerParameter;
+    };
+    responses?: {
+        [key: string]: swaggerResponse;
     };
 }
