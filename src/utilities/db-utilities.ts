@@ -1,9 +1,9 @@
-import { Factory } from '@models/factory';
-import { Identifiable } from '@models/identifiable';
-import { Document, MongoClient } from 'mongodb';
-import { ObjectNotFoundError } from '../errors';
+import { Factory } from "@models/factory";
+import { Identifiable } from "@models/identifiable";
+import { Document, MongoClient } from "mongodb";
+import { ObjectNotFoundError } from "../errors";
 
-require('dotenv').config();
+require("dotenv").config();
 // TODO: Db connection pooling.
 
 export class DbUtilities {
@@ -18,7 +18,7 @@ export class DbUtilities {
             const result = await collection.insertOne(o);
 
             if (!result) {
-                throw new Error('Error inserting.');
+                throw new Error("Error inserting.");
             }
         } catch (ex) {
             throw ex;
@@ -38,7 +38,9 @@ export class DbUtilities {
             const query = { _id: _id };
             const data = await collection.findOne<T>(query);
             if (!data) {
-                throw new ObjectNotFoundError('Error getting object with id ' + _id + '.');
+                throw new ObjectNotFoundError(
+                    "Error getting object with id " + _id + "."
+                );
             }
 
             let o = factory.make(data);
@@ -64,7 +66,7 @@ export class DbUtilities {
             const result = await collection.replaceOne(query, o);
 
             if (!result) {
-                throw new Error('Error updating.');
+                throw new Error("Error updating.");
             }
         } catch (ex) {
             throw ex;
@@ -83,10 +85,12 @@ export class DbUtilities {
             const database = dbClient.db(process.env.DB_NAME);
             const collection = database.collection(factory.getCollectionName());
 
-            const result = await collection.replaceOne(query, o, { upsert: true });
+            const result = await collection.replaceOne(query, o, {
+                upsert: true,
+            });
 
             if (!result) {
-                throw new Error('Error upserting.');
+                throw new Error("Error upserting.");
             }
         } catch (ex) {
             throw ex;
@@ -107,7 +111,7 @@ export class DbUtilities {
             const query = { _id: _id };
             const data = await collection.deleteOne(query);
             if (!data) {
-                throw new Error('Error deleting object with id ' + _id + '.');
+                throw new Error("Error deleting object with id " + _id + ".");
             }
         } catch (ex) {
             throw ex;
@@ -116,7 +120,11 @@ export class DbUtilities {
         }
     }
 
-    static async Query<T>(query: any, factory: Factory<T>, projection?: any): Promise<T[]> {
+    static async Query<T>(
+        query: any,
+        factory: Factory<T>,
+        projection?: any
+    ): Promise<T[]> {
         const dbClient = new MongoClient(`${process.env.DB_CONN_STRING}`);
         try {
             await dbClient.connect();
@@ -138,7 +146,11 @@ export class DbUtilities {
         }
     }
 
-    static async ProjectedQuery(query: any, collectionName: string, projection: any): Promise<any[]> {
+    static async ProjectedQuery(
+        query: any,
+        collectionName: string,
+        projection: any
+    ): Promise<any[]> {
         const dbClient = new MongoClient(`${process.env.DB_CONN_STRING}`);
         try {
             await dbClient.connect();
